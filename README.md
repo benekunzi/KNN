@@ -6,6 +6,11 @@
 - README.md
 - neural_network.py
 - imagesNetwork.py
+- progressBar.py
+- main.py
+- unsorting.py
+- Model_saved
+|   - model.pth
 - Bilder
 |   - Bilder bearbeitet
 |       - Bilder-Uni-Baby-Bearb
@@ -36,5 +41,5 @@
 ```
 
 ## To dos
-- Alle Bilder in einen Tensor laden und dessen Einträge random sortieren -> Eingangsdaten und Ausgangsdaten müssen dem selben Muster entprechen
+- KI verbessern -> anderes Netzwerk wählen
 - weitere Fotos zuschneiden
