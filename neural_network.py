@@ -5,7 +5,7 @@ import torch
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        size_input = 32*32*3
+        size_input = 32*32*1
         dev = 12
         number_perc = int(size_input/dev)
         self.fc1 = nn.Linear(size_input, number_perc)

@@ -7,6 +7,7 @@ from progressBar import ProgressBar
 import torch.optim as optim
 from unsorting import unsorting
 import os 
+import numpy as np
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
@@ -30,13 +31,14 @@ if __name__ == "__main__":
             for j in range(0,number):
                 for i in range(0, iterations):
                     progessBar.progressBar(i)
-                    orig_flatten = torch.flatten(o_tensor[j][i])
-                    edit_flatten = torch.flatten(e_tensor[j][i])
-                    out = net(orig_flatten)
-                    loss = F.mse_loss(out, edit_flatten)
-                    loss.backward()
-                    optimizer.step()
-                    optimizer.zero_grad()
+                    for k in range(3):
+                        orig_flatten = torch.flatten(o_tensor[j][i][k])
+                        edit_flatten = torch.flatten(e_tensor[j][i][k])
+                        out = net(orig_flatten)
+                        loss = F.mse_loss(out, edit_flatten)
+                        loss.backward()
+                        optimizer.step()
+                        optimizer.zero_grad()
             print("Loss: ", loss)
 
         torch.save(net.state_dict(), "Model_saved/model.pth")
@@ -47,30 +49,31 @@ if __name__ == "__main__":
 
     large_img = loadSingleImage("Bilder/img_5568-o-test.jpg")
 
-    # print("large: ", large_img.size())
+    print("large: ", large_img.size())
 
-    # a = torch.zeros(3,3008,4576)
-    # i = 0
-    # for h in range(0, 3008, 32):
-    #     for l in range(0, 4576, 32):
-    #         a[:,h:h+32,l:l+32] = large_img[i,:,:,:]
-    #         i += 1
+    a = torch.zeros(3,3008,4576)
+    i = 0
+    for h in range(0, 3008, 32):
+        for l in range(0, 4576, 32):
+            a[:,h:h+32,l:l+32] = large_img[i,:,:,:]
+            i += 1
 
-    # a *= 255.0
-    # a = a.int()
-    # a = a.permute(1,2,0)
-
+    a *= 255.0
+    a = a.int()
+    a = a.permute(1,2,0)
+    b = a.detach().numpy()
+    # plt.figure(1)
     # plt.imshow(a)
-    # plt.show()
 
     edited_img = torch.zeros(large_img.size())
 
     with torch.no_grad():
         for i in range(0, len(large_img)):
-            flatten = torch.flatten(large_img[i])
-            out = loaded_net(flatten)
-            out = out.unflatten(0, (3,32,32))
-            edited_img[i] = out
+            for j in range(3):
+                flatten = torch.flatten(large_img[i][j])
+                out = loaded_net(flatten)
+                out = out.unflatten(0, (1,32,32))
+                edited_img[i][j] = out
 
     print("edit", edited_img.size())
 
@@ -86,5 +89,6 @@ if __name__ == "__main__":
     a = a.permute(1,2,0)
     b = a.detach().numpy()
 
-    plt.imshow(b.astype('uint8'))
+    plt.figure(2)
+    plt.imshow(a)
     plt.show()
